@@ -4,6 +4,7 @@ import models.User
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.SchemaUtils.create
 import org.jetbrains.exposed.sql.transactions.transaction
+import org.mindrot.jbcrypt.BCrypt
 
 object UserSchema : Table() {
   val id = integer("id").autoIncrement().primaryKey()
@@ -66,7 +67,7 @@ fun userRegister(newEmail: String, newPassword: String): User {
     }
     UserSchema.insert {
       it[email] = newEmail
-      it[password] = newPassword
+      it[password] = BCrypt.hashpw(newPassword, BCrypt.gensalt(12));
     } get UserSchema.id
   }
 
