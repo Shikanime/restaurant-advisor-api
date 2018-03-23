@@ -10,14 +10,14 @@ import javax.ws.rs.core.MediaType
 @Path("restaurant")
 @Produces(MediaType.APPLICATION_JSON)
 class RestaurantController {
-    @GET
-    fun getById(@QueryParam("id") id: Int): Restaurant {
-        return Restaurant("")
-    }
+  @GET
+  fun getById(@QueryParam("id") id: Int): Restaurant {
+    return Restaurant("")
+  }
 
-    @GET
-    @Path("all")
-    fun getAll(): Array<Restaurant> {
-        return arrayOf(Restaurant(""))
-    }
+  @GET
+  @Path("all")
+  fun getAll(): Array<Restaurant> {
+    return arrayOf(Restaurant(""))
+  }
 }

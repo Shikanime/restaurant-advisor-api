@@ -15,18 +15,18 @@ import javax.ws.rs.ext.Provider
  * Launch an embedded Jetty server, configured to use Jersey and Jackson.
  */
 fun main(args: Array<String>) {
-    println("Starting up")
+  println("Starting up")
 
-    val baseUri = UriBuilder.fromUri(   "http://localhost/").port(8080).build()
-    val config = ResourceConfig()
-            .register(JacksonFeature::class.java) // enable Jackson JSON provider
-            .register(ObjectMapperProvider::class.java) // use our ObjectMapper rather than the default
-            .register(RestaurantController())
-            .register(UserController())
+  val baseUri = UriBuilder.fromUri("http://localhost/").port(8080).build()
+  val config = ResourceConfig()
+    .register(JacksonFeature::class.java) // enable Jackson JSON provider
+    .register(ObjectMapperProvider::class.java) // use our ObjectMapper rather than the default
+    .register(RestaurantController())
+    .register(UserController())
 
-    JettyHttpContainerFactory.createServer(baseUri, config).use { server ->
-        server.join()
-    }
+  JettyHttpContainerFactory.createServer(baseUri, config).use { server ->
+    server.join()
+  }
 }
 
 /**
@@ -36,12 +36,12 @@ fun main(args: Array<String>) {
  */
 @Provider
 class ObjectMapperProvider : ContextResolver<ObjectMapper> {
-    private val objectMapper = ObjectMapper()
-            .enable(SerializationFeature.INDENT_OUTPUT) // pretty-print
-            .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS) // use iso-8601 for dates
-            .registerModule(KotlinModule()) // this doesn't seem to be required to serialize our data class, but it is required to deserialize
+  private val objectMapper = ObjectMapper()
+    .enable(SerializationFeature.INDENT_OUTPUT) // pretty-print
+    .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS) // use iso-8601 for dates
+    .registerModule(KotlinModule()) // this doesn't seem to be required to serialize our data class, but it is required to deserialize
 
-    override fun getContext(type: Class<*>?): ObjectMapper? = objectMapper
+  override fun getContext(type: Class<*>?): ObjectMapper? = objectMapper
 }
 
 
@@ -53,9 +53,9 @@ class ObjectMapperProvider : ContextResolver<ObjectMapper> {
  * @param block a function to process this Server.
  */
 inline fun Server.use(block: (Server) -> Unit) {
-    try {
-        block(this)
-    } finally {
-        this.destroy()
-    }
+  try {
+    block(this)
+  } finally {
+    this.destroy()
+  }
 }
