@@ -21,10 +21,10 @@ jar {
 
 repositories {
     maven {
-        url 'https://dl.bintray.com/kotlin/exposed/'
+        url = 'https://dl.bintray.com/kotlin/exposed/'
     }
     maven {
-        url 'https://repo.gradle.org/gradle/repo'
+        url = "https://repo.gradle.org/gradle/repo"
     }
     mavenCentral()
 }
