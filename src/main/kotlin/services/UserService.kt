@@ -9,7 +9,7 @@ import org.mindrot.jbcrypt.BCrypt
 object UserSchema : Table() {
   val id = integer("id").autoIncrement().primaryKey()
   val email = varchar("email", length = 50)
-  val password = varchar("password", length = 50)
+  val password = varchar("password", length = 60)
 }
 
 const val databaseUrl = "jdbc:postgresql://localhost:5432/resto"
@@ -62,9 +62,11 @@ fun userRegister(newEmail: String, newPassword: String): User {
 
   transaction {
     create(UserSchema)
+
     UserSchema.select {
       UserSchema.email.eq(newEmail)
     }
+
     UserSchema.insert {
       it[email] = newEmail
       it[password] = BCrypt.hashpw(newPassword, BCrypt.gensalt(12));
