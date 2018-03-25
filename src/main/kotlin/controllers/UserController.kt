@@ -1,5 +1,6 @@
 package controllers
 
+import models.Response
 import models.User
 import services.findAllUser
 import services.findUserById
@@ -13,30 +14,48 @@ import javax.ws.rs.core.MediaType.APPLICATION_JSON
 class UserController {
   @GET
   @Path("{id}")
-  fun getById(@QueryParam("id") id: Int): User {
+  fun getById(@PathParam("id") id: Int): Response {
     println("[trace] Open get by id user")
-    return findUserById(id)
+
+    val data = findUserById(id)
+    if (data == User("", "", "", "")) {
+      return Response(false, null, "This user doesn't exist in current database")
+0   }
+
+    return Response(true, findUserById(id), "")
   }
 
   @GET
   @Path("all")
-  fun getAll(): Array<User> {
+  fun getAll(): Response {
     println("[trace] Open get all user")
-    return findAllUser()
+
+    val data = findAllUser()
+    if (data.count() <= 0) {
+      return Response(false, null, "No one user is currently registered into database")
+    }
+
+    return Response(true, findAllUser(), "")
   }
 
   @GET
   @Path("login")
-  fun login(@QueryParam("email") email: String, @QueryParam("password") password: String): User {
+  fun login(
+    @QueryParam("email") email: String,
+    @QueryParam("password") password: String): Response {
     println("[trace] Login user")
-    return userLogin(email, password)
+
+    val data = userLogin(email, password)
+    return Response(data, null, if (data) "" else "Login failed")
   }
 
   @POST
   @Consumes(APPLICATION_JSON)
   @Path("register")
-  fun register(user: User): User {
+  fun register(user: User): Response {
     println("[trace] Register user")
-    return userRegister(user.email, user.password)
+
+    val data = userRegister(user)
+    return Response(data, null, if (data) "" else "Register failed")
   }
 }
