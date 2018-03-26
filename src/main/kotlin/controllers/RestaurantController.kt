@@ -21,7 +21,7 @@ class RestaurantController {
       Response(true, findRestaurantById(id), "")
     } catch (error: Exception) {
       println("[error] Fail to get restaurant from $id: $error")
-      Response(false, null, error.toString())
+      Response(false, null, error.message)
     }
   }
 
@@ -34,7 +34,7 @@ class RestaurantController {
       Response(true, findAllRestaurant(), "")
     } catch (error: Exception) {
       println("[error] Fail to get all restaurant: $error")
-      Response(false, null, error.toString())
+      Response(false, null, error.message)
     }
   }
 
@@ -47,7 +47,7 @@ class RestaurantController {
       Response(true, addRestaurant(restaurant), "")
     } catch (error: Exception) {
       println("[error] Register restaurant fail: $error")
-      Response(false, null, error.toString())
+      Response(false, null, error.message)
     }
   }
 
@@ -61,7 +61,7 @@ class RestaurantController {
       Response(false, addAvisToRestaurant(userId, restaurantId, avis), "")
     } catch (error: Exception) {
       println("[error] Fail to create new avis to $restaurantId from user $userId: $error")
-      Response(false, null, error.toString())
+      Response(false, null, error.message)
     }
   }
 }

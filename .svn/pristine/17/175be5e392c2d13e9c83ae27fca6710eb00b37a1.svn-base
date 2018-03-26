@@ -6,7 +6,6 @@ import org.apache.commons.validator.routines.EmailValidator
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.selectAll
-import org.joda.time.DateTime
 import org.mindrot.jbcrypt.BCrypt
 
 fun findUserById(id: Int): User {
@@ -22,8 +21,7 @@ fun findUserById(id: Int): User {
     return@runQuery User(findUser[UserSchema.firstName],
       findUser[UserSchema.lastName],
       findUser[UserSchema.email],
-      "",
-      findUser[UserSchema.birthday].toString())
+      "")
   }
 }
 
@@ -34,9 +32,7 @@ fun findAllUser(): Array<User> {
       .map {
         User(it[UserSchema.firstName],
           it[UserSchema.lastName],
-          it[UserSchema.email],
-          "",
-          it[UserSchema.birthday].toString())
+          it[UserSchema.email], "")
       }
       .toTypedArray()
   }
@@ -67,24 +63,14 @@ fun addUser(user: User): Int {
       }.count() > 0)
       throw Exception("Email already exist")
 
-    if (user.firstName.length > 20)
-      throw Exception("Invalid first name length, max is 20 characters")
-
-    if (user.lastName.length > 20)
-      throw Exception("Invalid last name length, max is 20 characters")
-
     if (!EmailValidator.getInstance().isValid(user.email))
       throw Exception("Email is not valid")
-
-    if (user.password.length > 20 || user.password.length < 5)
-      throw Exception("Invalid password length, max is 60 characters and minimum is about 6 characters")
 
     return@runQuery UserSchema.insert {
       it[lastName] = user.lastName
       it[firstName] = user.firstName
       it[email] = user.email
-      it[password] = BCrypt.hashpw(user.password, BCrypt.gensalt(12))
-      it[birthday] = DateTime.parse(user.birthday)
+      it[password] = BCrypt.hashpw(user.password, BCrypt.gensalt(12));
     } get UserSchema.id
       ?: throw Exception("Fail to insert user")
   }

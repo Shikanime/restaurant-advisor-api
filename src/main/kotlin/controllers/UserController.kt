@@ -22,7 +22,7 @@ class UserController {
       Response(true, findUserById(id), "")
     } catch (error: Exception) {
       println("[error] Fail to get restaurant from $id: $error")
-      Response(false, null, error.toString())
+      Response(false, null, error.message)
     }
   }
 
@@ -35,7 +35,7 @@ class UserController {
       Response(true, findAllUser(), "")
     } catch (error: Exception) {
       println("[error] Fail to get all users: $error")
-      Response(false, null, error.toString())
+      Response(false, null, error.message)
     }
   }
 
@@ -50,7 +50,7 @@ class UserController {
       Response(true, userLogin(email, password), "")
     } catch (error: Exception) {
       println("[error] Fail to login: $error")
-      Response(false, null, error.toString())
+      Response(false, null, error.message)
     }
   }
 
@@ -63,7 +63,7 @@ class UserController {
       Response(true, addUser(user), "")
     } catch (error: Exception) {
       println("[error] Fail to login: $error")
-      Response(false, null, error.toString())
+      Response(false, null, error.message)
     }
   }
 }

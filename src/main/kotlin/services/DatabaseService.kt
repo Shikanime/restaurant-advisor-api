@@ -16,6 +16,7 @@ object UserSchema : Table() {
   val lastName = varchar("lastName", length = 20)
   val email = varchar("email", length = 50)
   val password = varchar("password", length = 60)
+  val birthday = date("birthday")
 }
 
 object RestaurantSchema : Table() {
