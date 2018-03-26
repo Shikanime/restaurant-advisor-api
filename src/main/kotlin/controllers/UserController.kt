@@ -2,12 +2,13 @@ package controllers
 
 import models.Response
 import models.User
+import services.addUser
 import services.findAllUser
 import services.findUserById
 import services.userLogin
-import services.userRegister
 import javax.ws.rs.*
 import javax.ws.rs.core.MediaType.APPLICATION_JSON
+
 
 @Path("user")
 @Produces(APPLICATION_JSON)
@@ -17,12 +18,12 @@ class UserController {
   fun getById(@PathParam("id") id: Int): Response {
     println("[trace] Open get by id user")
 
-    val data = findUserById(id)
-    if (data == User("", "", "", "")) {
-      return Response(false, null, "This user doesn't exist in current database")
-0   }
-
-    return Response(true, findUserById(id), "")
+    return try {
+      Response(true, findUserById(id), "")
+    } catch (error: Exception) {
+      println("[error] Fail to get restaurant from $id: $error")
+      Response(false, null, error.toString())
+    }
   }
 
   @GET
@@ -30,12 +31,12 @@ class UserController {
   fun getAll(): Response {
     println("[trace] Open get all user")
 
-    val data = findAllUser()
-    if (data.count() <= 0) {
-      return Response(false, null, "No one user is currently registered into database")
+    return try {
+      Response(true, findAllUser(), "")
+    } catch (error: Exception) {
+      println("[error] Fail to get all users: $error")
+      Response(false, null, error.toString())
     }
-
-    return Response(true, findAllUser(), "")
   }
 
   @GET
@@ -45,17 +46,24 @@ class UserController {
     @QueryParam("password") password: String): Response {
     println("[trace] Login user")
 
-    val data = userLogin(email, password)
-    return Response(data, null, if (data) "" else "Login failed")
+    return try {
+      Response(true, userLogin(email, password), "")
+    } catch (error: Exception) {
+      println("[error] Fail to login: $error")
+      Response(false, null, error.toString())
+    }
   }
 
   @POST
   @Consumes(APPLICATION_JSON)
-  @Path("register")
-  fun register(user: User): Response {
+  fun createUser(user: User): Response {
     println("[trace] Register user")
 
-    val data = userRegister(user)
-    return Response(data, null, if (data) "" else "Register failed")
+    return try {
+      Response(true, addUser(user), "")
+    } catch (error: Exception) {
+      println("[error] Fail to login: $error")
+      Response(false, null, error.toString())
+    }
   }
 }

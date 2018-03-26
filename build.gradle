@@ -38,6 +38,8 @@ dependencies {
   compile group: 'org.postgresql', name: 'postgresql', version: '42.2.2'
   compile group: 'joda-time', name: 'joda-time', version: '2.3'
   compile group: 'org.slf4j', name: 'slf4j-simple', version: '1.7.25'
+  compile group: 'org.bitbucket.b_c', name: 'jose4j', version: '0.6.3'
+  compile group: 'com.nimbusds', name: 'nimbus-jose-jwt', version: '5.7'
 }
 
 task wrapper(type: Wrapper) {

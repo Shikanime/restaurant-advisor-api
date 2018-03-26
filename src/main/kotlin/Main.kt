@@ -15,8 +15,6 @@ import javax.ws.rs.ext.Provider
  * Launch an embedded Jetty server, configured to use Jersey and Jackson.
  */
 fun main(args: Array<String>) {
-  println("Starting up")
-
   val baseUri = UriBuilder.fromUri("http://localhost/").port(8080).build()
   val config = ResourceConfig()
     .register(JacksonFeature::class.java) // enable Jackson JSON provider
