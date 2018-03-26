@@ -1,3 +1,5 @@
 package models
 
-data class Restaurant(val name: String)
+data class Restaurant(
+  val name: String
+)

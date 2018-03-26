@@ -17,7 +17,12 @@ class RestaurantController {
   fun getById(@QueryParam("id") id: Int): Response {
     println("[trace] Open get by id restaurant")
 
-    return Response(true, findRestaurantById(id), "")
+    return try {
+      Response(true, findRestaurantById(id), "")
+    } catch (error: Exception) {
+      println("[error] Fail to get restaurant from $id: $error")
+      Response(false, null, error.toString())
+    }
   }
 
   @GET
@@ -25,7 +30,12 @@ class RestaurantController {
   fun getAll(): Response {
     println("[trace] Open get all restaurant")
 
-    return Response(true, findAllRestaurant(), "")
+    return try {
+      Response(true, findAllRestaurant(), "")
+    } catch (error: Exception) {
+      println("[error] Fail to get all restaurant: $error")
+      Response(false, null, error.toString())
+    }
   }
 
   @POST
@@ -33,8 +43,12 @@ class RestaurantController {
   fun createRestaurant(restaurant: Restaurant): Response {
     println("[trace] Register restaurant")
 
-    val data = addRestaurant(restaurant)
-    return Response(data, null, if (data) "" else "Register failed")
+    return try {
+      Response(true, addRestaurant(restaurant), "")
+    } catch (error: Exception) {
+      println("[error] Register restaurant fail: $error")
+      Response(false, null, error.toString())
+    }
   }
 
   @POST
@@ -43,6 +57,11 @@ class RestaurantController {
   fun createAvis(@QueryParam("user_id") userId: Int, @QueryParam("restaurant_id") restaurantId: Int, avis: Avis): Response {
     println("[trace] Register user avis to restaurant")
 
-    return Response(false, addAvisToRestaurant(userId, restaurantId, avis), "")
+    return try {
+      Response(false, addAvisToRestaurant(userId, restaurantId, avis), "")
+    } catch (error: Exception) {
+      println("[error] Fail to create new avis to $restaurantId from user $userId: $error")
+      Response(false, null, error.toString())
+    }
   }
 }

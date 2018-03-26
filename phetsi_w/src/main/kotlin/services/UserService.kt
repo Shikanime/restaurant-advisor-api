@@ -19,14 +19,7 @@ object UserSchema : Table() {
   val password = varchar("password", length = 60)
 }
 
-fun fromRowUser(r: ResultRow): User {
-  return User(r[UserSchema.firstName],
-    r[UserSchema.lastName],
-    r[UserSchema.email],
-    "")
-}
-
-fun findUserById(id: Int): User? {
+fun findUserById(id: Int): User {
   Database.connect(databaseUrl, driver = databaseDriver, user = databaseUser, password = databasePassword)
 
   return transaction {
@@ -37,14 +30,13 @@ fun findUserById(id: Int): User? {
     }
 
     if (findUsers.count() <= 0)
-      return@transaction null
+      throw Exception("Cannot find $id user")
 
     val findUser = findUsers.first()
-
     return@transaction User(findUser[UserSchema.firstName],
       findUser[UserSchema.lastName],
       findUser[UserSchema.email],
-      findUser[UserSchema.password])
+      "")
   }
 }
 
@@ -65,7 +57,7 @@ fun findAllUser(): Array<User> {
   }
 }
 
-fun userLogin(email: String, password: String): String? {
+fun userLogin(email: String, password: String): String {
   Database.connect(databaseUrl, driver = databaseDriver, user = databaseUser, password = databasePassword)
 
   return transaction {
@@ -76,18 +68,19 @@ fun userLogin(email: String, password: String): String? {
     }
 
     if (findUsers.count() <= 0)
-      return@transaction null
+      throw Exception("Cannot find user from email")
 
     val findUser = findUsers.first()
 
     if (!BCrypt.checkpw(password, findUser[UserSchema.password]))
-      return@transaction null
+      throw Exception("Password doesn't match")
 
     return@transaction generateToken(findUser[UserSchema.id].toString())
+      ?: throw Exception("Generate token fail")
   }
 }
 
-fun addUser(user: User): Boolean {
+fun addUser(user: User): Int {
   Database.connect(databaseUrl, driver = databaseDriver, user = databaseUser, password = databasePassword)
 
   return transaction {
@@ -96,15 +89,14 @@ fun addUser(user: User): Boolean {
     if (UserSchema.select {
         UserSchema.email.eq(user.email)
       }.count() > 0)
-      return@transaction false
+      throw Exception("Email already exist")
 
-    UserSchema.insert {
+    return@transaction UserSchema.insert {
       it[lastName] = user.lastName
       it[firstName] = user.firstName
       it[email] = user.email
       it[password] = BCrypt.hashpw(user.password, BCrypt.gensalt(12));
-    } get UserSchema.id ?: return@transaction false
-
-    return@transaction true
+    } get UserSchema.id
+      ?: throw Exception("Fail to insert user")
   }
 }

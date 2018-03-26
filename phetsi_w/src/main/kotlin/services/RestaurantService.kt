@@ -17,9 +17,9 @@ object RestaurantSchema : Table() {
 
 object RestaurantAvisSchema : Table() {
   val id = integer("id").autoIncrement().primaryKey()
-  val userId = integer("user_id").uniqueIndex()
-  val avisId = integer("avis_id").uniqueIndex()
-  val restaurantId = integer("restaurant_id").uniqueIndex()
+  val userId = integer("user_id")
+  val avisId = integer("avis_id")
+  val restaurantId = integer("restaurant_id")
 }
 
 object AvisSchema : Table() {
@@ -28,7 +28,7 @@ object AvisSchema : Table() {
   val content = varchar("content", length = 300)
 }
 
-fun findRestaurantById(id: Int): Restaurant? {
+fun findRestaurantById(id: Int): Restaurant {
   Database.connect(databaseUrl, driver = databaseDriver, user = databaseUser, password = databasePassword)
 
   return transaction {
@@ -39,11 +39,9 @@ fun findRestaurantById(id: Int): Restaurant? {
     }
 
     if (findRestaurants.count() <= 0)
-      return@transaction null
+      throw Exception("Cannot find restaurant")
 
-    val findRestaurant = findRestaurants.first()
-
-    return@transaction Restaurant(findRestaurant[RestaurantSchema.name])
+    return@transaction Restaurant(findRestaurants.first()[RestaurantSchema.name])
   }
 }
 
@@ -62,38 +60,46 @@ fun findAllRestaurant(): Array<Restaurant> {
   }
 }
 
-fun addRestaurant(restaurant: Restaurant): Boolean {
+fun addRestaurant(restaurant: Restaurant): Int {
   Database.connect(databaseUrl, driver = databaseDriver, user = databaseUser, password = databasePassword)
 
   return transaction {
     create(UserSchema)
 
-    RestaurantSchema.insert {
+    return@transaction RestaurantSchema.insert {
       it[name] = restaurant.name
-    } get RestaurantSchema.id ?: return@transaction false
-
-    return@transaction true
+    } get RestaurantSchema.id
+      ?: throw Exception("Fail to create new restaurant retry again later")
   }
 }
 
 
-fun addAvisToRestaurant(currentUserId: Int, currentRestaurantId: Int, avis: Avis): Boolean {
+fun addAvisToRestaurant(currentUserId: Int, currentRestaurantId: Int, avis: Avis): Int {
   Database.connect(databaseUrl, driver = databaseDriver, user = databaseUser, password = databasePassword)
 
   return transaction {
     create(RestaurantSchema, RestaurantAvisSchema, AvisSchema)
 
+    if (avis.score > 5 || avis.score < 0)
+      throw Exception("Score ${avis.score} must be between 0 or 5")
+
+    if (findRestaurantById(currentRestaurantId) == null)
+      throw Exception("$currentRestaurantId id doesn't exist")
+
+    if (findUserById(currentUserId) == null)
+      throw Exception("$currentUserId doesn't exist")
+
     val currentAvisId = AvisSchema.insert {
       it[score] = avis.score
       it[content] = avis.content
-    } get AvisSchema.id ?: return@transaction false
+    } get AvisSchema.id
+      ?: throw Exception("Avis creation failed, retry again")
 
-    RestaurantAvisSchema.insert {
+    return@transaction RestaurantAvisSchema.insert {
       it[userId] = currentUserId
       it[avisId] = currentAvisId
       it[restaurantId] = currentRestaurantId
-    } get RestaurantAvisSchema.id ?: return@transaction false
-
-    return@transaction true
+    } get RestaurantAvisSchema.id
+      ?: throw Exception("Restaurant avis creation failed, retry again")
   }
 }
