@@ -1,14 +1,10 @@
 package services
 
-import databaseDriver
-import databasePassword
-import databaseUrl
-import databaseUser
 import models.Avis
 import models.Restaurant
-import org.jetbrains.exposed.sql.*
-import org.jetbrains.exposed.sql.SchemaUtils.create
-import org.jetbrains.exposed.sql.transactions.transaction
+import org.jetbrains.exposed.sql.insert
+import org.jetbrains.exposed.sql.select
+import org.jetbrains.exposed.sql.selectAll
 
 fun findRestaurantById(id: Int): Restaurant {
   return runQuery {

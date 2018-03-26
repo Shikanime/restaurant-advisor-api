@@ -1,15 +1,11 @@
 package services
 
-import databaseDriver
-import databasePassword
-import databaseUrl
-import databaseUser
 import generateToken
 import models.User
 import org.apache.commons.validator.routines.EmailValidator
-import org.jetbrains.exposed.sql.*
-import org.jetbrains.exposed.sql.SchemaUtils.create
-import org.jetbrains.exposed.sql.transactions.transaction
+import org.jetbrains.exposed.sql.insert
+import org.jetbrains.exposed.sql.select
+import org.jetbrains.exposed.sql.selectAll
 import org.mindrot.jbcrypt.BCrypt
 
 fun findUserById(id: Int): User {
