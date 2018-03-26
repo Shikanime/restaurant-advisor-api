@@ -2,10 +2,10 @@ package controllers
 
 import models.Response
 import models.User
-import services.addUser
 import services.findAllUser
 import services.findUserById
 import services.userLogin
+import services.userRegister
 import javax.ws.rs.*
 import javax.ws.rs.core.MediaType.APPLICATION_JSON
 
@@ -19,7 +19,10 @@ class UserController {
     println("[trace] Open get by id user")
 
     val data = findUserById(id)
-      ?: return Response(false, null, "This user doesn't exist in current database")
+    if (data == null) {
+      return Response(false, null, "This user doesn't exist in current database")
+      0
+    }
 
     return Response(true, findUserById(id), "")
   }
@@ -47,10 +50,11 @@ class UserController {
 
   @POST
   @Consumes(APPLICATION_JSON)
-  fun createUser(user: User): Response {
+  @Path("register")
+  fun register(user: User): Response {
     println("[trace] Register user")
 
-    val data = addUser(user)
+    val data = userRegister(user)
     return Response(data, null, if (data) "" else "Register failed")
   }
 }

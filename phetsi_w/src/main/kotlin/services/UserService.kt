@@ -1,16 +1,15 @@
 package services
 
+import databaseDriver
+import databasePassword
+import databaseUrl
+import databaseUser
 import generateToken
 import models.User
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.SchemaUtils.create
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.mindrot.jbcrypt.BCrypt
-
-const val databaseUrl = "jdbc:postgresql://localhost:5432/resto"
-const val databaseDriver = "org.postgresql.Driver"
-const val databaseUser = "resto"
-const val databasePassword = "evolution"
 
 object UserSchema : Table() {
   val id = integer("id").autoIncrement().primaryKey()
@@ -20,7 +19,7 @@ object UserSchema : Table() {
   val password = varchar("password", length = 60)
 }
 
-fun fromRow(r: ResultRow): User {
+fun fromRowUser(r: ResultRow): User {
   return User(r[UserSchema.firstName],
     r[UserSchema.lastName],
     r[UserSchema.email],
@@ -88,7 +87,7 @@ fun userLogin(email: String, password: String): String? {
   }
 }
 
-fun userRegister(user: User): Boolean {
+fun addUser(user: User): Boolean {
   Database.connect(databaseUrl, driver = databaseDriver, user = databaseUser, password = databasePassword)
 
   return transaction {
