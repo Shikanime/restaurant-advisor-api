@@ -40,9 +40,6 @@ dependencies {
   compile group: 'org.slf4j', name: 'slf4j-simple', version: '1.7.25'
   compile group: 'org.bitbucket.b_c', name: 'jose4j', version: '0.6.3'
   compile group: 'com.nimbusds', name: 'nimbus-jose-jwt', version: '5.7'
-  compile group: 'commons-validator', name: 'commons-validator', version: '1.6'
-
-
 }
 
 task wrapper(type: Wrapper) {

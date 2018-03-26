@@ -10,30 +10,8 @@ import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.SchemaUtils.create
 import org.jetbrains.exposed.sql.transactions.transaction
 
-object RestaurantSchema : Table() {
-  val id = integer("id").autoIncrement().primaryKey()
-  val name = varchar("password", length = 50)
-}
-
-object RestaurantAvisSchema : Table() {
-  val id = integer("id").autoIncrement().primaryKey()
-  val userId = integer("user_id")
-  val avisId = integer("avis_id")
-  val restaurantId = integer("restaurant_id")
-}
-
-object AvisSchema : Table() {
-  val id = integer("id").autoIncrement().primaryKey()
-  val score = integer("score")
-  val content = varchar("content", length = 300)
-}
-
 fun findRestaurantById(id: Int): Restaurant {
-  Database.connect(databaseUrl, driver = databaseDriver, user = databaseUser, password = databasePassword)
-
-  return transaction {
-    create(RestaurantSchema)
-
+  return runQuery {
     val findRestaurants = RestaurantSchema.select {
       RestaurantSchema.id eq id
     }
@@ -41,17 +19,13 @@ fun findRestaurantById(id: Int): Restaurant {
     if (findRestaurants.count() <= 0)
       throw Exception("Cannot find restaurant")
 
-    return@transaction Restaurant(findRestaurants.first()[RestaurantSchema.name])
+    return@runQuery Restaurant(findRestaurants.first()[RestaurantSchema.name])
   }
 }
 
 fun findAllRestaurant(): Array<Restaurant> {
-  Database.connect(databaseUrl, driver = databaseDriver, user = databaseUser, password = databasePassword)
-
-  return transaction {
-    create(RestaurantSchema)
-
-    return@transaction RestaurantSchema
+  return runQuery {
+    return@runQuery RestaurantSchema
       .selectAll()
       .map {
         Restaurant(it[RestaurantSchema.name])
@@ -61,33 +35,21 @@ fun findAllRestaurant(): Array<Restaurant> {
 }
 
 fun addRestaurant(restaurant: Restaurant): Int {
-  Database.connect(databaseUrl, driver = databaseDriver, user = databaseUser, password = databasePassword)
-
-  return transaction {
-    create(UserSchema)
-
-    return@transaction RestaurantSchema.insert {
+  return runQuery {
+    return@runQuery RestaurantSchema.insert {
       it[name] = restaurant.name
     } get RestaurantSchema.id
       ?: throw Exception("Fail to create new restaurant retry again later")
   }
 }
 
-
 fun addAvisToRestaurant(currentUserId: Int, currentRestaurantId: Int, avis: Avis): Int {
-  Database.connect(databaseUrl, driver = databaseDriver, user = databaseUser, password = databasePassword)
-
-  return transaction {
-    create(RestaurantSchema, RestaurantAvisSchema, AvisSchema)
-
+  return runQuery {
     if (avis.score > 5 || avis.score < 0)
       throw Exception("Score ${avis.score} must be between 0 or 5")
 
-    if (findRestaurantById(currentRestaurantId) == null)
-      throw Exception("$currentRestaurantId id doesn't exist")
-
-    if (findUserById(currentUserId) == null)
-      throw Exception("$currentUserId doesn't exist")
+    findRestaurantById(currentRestaurantId)
+    findUserById(currentUserId)
 
     val currentAvisId = AvisSchema.insert {
       it[score] = avis.score
@@ -95,7 +57,7 @@ fun addAvisToRestaurant(currentUserId: Int, currentRestaurantId: Int, avis: Avis
     } get AvisSchema.id
       ?: throw Exception("Avis creation failed, retry again")
 
-    return@transaction RestaurantAvisSchema.insert {
+    return@runQuery RestaurantAvisSchema.insert {
       it[userId] = currentUserId
       it[avisId] = currentAvisId
       it[restaurantId] = currentRestaurantId
