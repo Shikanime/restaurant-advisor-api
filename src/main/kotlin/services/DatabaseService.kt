@@ -22,6 +22,9 @@ object UserSchema : Table() {
 object RestaurantSchema : Table() {
   val id = integer("id").autoIncrement().primaryKey()
   val name = varchar("password", length = 50)
+  val address = varchar("address", length = 50)
+  val website = varchar("website", length = 50)
+  val phone = varchar("phone", length = 24)
 }
 
 object RestaurantAvisSchema : Table() {

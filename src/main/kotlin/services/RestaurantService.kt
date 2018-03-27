@@ -16,7 +16,13 @@ fun findRestaurantById(id: Int): Restaurant {
     if (foundRestaurants.count() <= 0)
       throw Exception("Cannot find restaurant")
 
-    return@runQuery Restaurant(foundRestaurants.first()[RestaurantSchema.name])
+    val foundRestaurant = foundRestaurants.first()
+
+    return@runQuery Restaurant(
+      foundRestaurant [RestaurantSchema.name],
+      foundRestaurant [RestaurantSchema.address],
+      foundRestaurant [RestaurantSchema.website],
+      foundRestaurant [RestaurantSchema.phone])
   }
 }
 
@@ -25,7 +31,11 @@ fun findAllRestaurant(): Array<Restaurant> {
     return@runQuery RestaurantSchema
       .selectAll()
       .map {
-        Restaurant(it[RestaurantSchema.name])
+        Restaurant(
+          it[RestaurantSchema.name],
+          it[RestaurantSchema.address],
+          it[RestaurantSchema.website],
+          it[RestaurantSchema.phone])
       }
       .toTypedArray()
   }
