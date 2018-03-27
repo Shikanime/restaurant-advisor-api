@@ -55,8 +55,8 @@
     </role>
     <schema id="11" parent="2" name="public">
       <ObjectId>2200</ObjectId>
-      <IntrospectionTimestamp>2018-03-27.10:04:24.304</IntrospectionTimestamp>
-      <IntrospectionStateNumber>556</IntrospectionStateNumber>
+      <IntrospectionTimestamp>2018-03-27.16:56:13.614</IntrospectionTimestamp>
+      <IntrospectionStateNumber>567</IntrospectionStateNumber>
       <Current>1</Current>
       <Visible>1</Visible>
     </schema>
@@ -75,7 +75,15 @@
     <schema id="16" parent="2" name="information_schema">
       <ObjectId>12002</ObjectId>
     </schema>
-    <sequence id="17" parent="11" name="avisschema_id_seq">
+    <sequence id="17" parent="11" name="restaurantschema_id_seq">
+      <ObjectId>24578</ObjectId>
+      <StateNumber>567</StateNumber>
+      <SequenceIdentity>1..2147483647</SequenceIdentity>
+      <BelongsToColumn>1</BelongsToColumn>
+      <CacheSize>1</CacheSize>
+      <DataType>integer</DataType>
+    </sequence>
+    <sequence id="18" parent="11" name="avisschema_id_seq">
       <ObjectId>16410</ObjectId>
       <StateNumber>556</StateNumber>
       <SequenceIdentity>1..2147483647</SequenceIdentity>
@@ -83,16 +91,8 @@
       <CacheSize>1</CacheSize>
       <DataType>integer</DataType>
     </sequence>
-    <sequence id="18" parent="11" name="restaurantavisschema_id_seq">
+    <sequence id="19" parent="11" name="restaurantavisschema_id_seq">
       <ObjectId>16394</ObjectId>
-      <StateNumber>556</StateNumber>
-      <SequenceIdentity>1..2147483647</SequenceIdentity>
-      <BelongsToColumn>1</BelongsToColumn>
-      <CacheSize>1</CacheSize>
-      <DataType>integer</DataType>
-    </sequence>
-    <sequence id="19" parent="11" name="restaurantschema_id_seq">
-      <ObjectId>16386</ObjectId>
       <StateNumber>556</StateNumber>
       <SequenceIdentity>1..2147483647</SequenceIdentity>
       <BelongsToColumn>1</BelongsToColumn>
@@ -116,8 +116,8 @@
       <StateNumber>556</StateNumber>
     </table>
     <table id="23" parent="11" name="restaurantschema">
-      <ObjectId>16388</ObjectId>
-      <StateNumber>556</StateNumber>
+      <ObjectId>24580</ObjectId>
+      <StateNumber>567</StateNumber>
     </table>
     <table id="24" parent="11" name="userschema">
       <ObjectId>16404</ObjectId>
@@ -202,7 +202,7 @@
       <Position>1</Position>
       <DataType>integer|0</DataType>
       <NotNull>1</NotNull>
-      <StateNumber>556</StateNumber>
+      <StateNumber>567</StateNumber>
       <DefaultExpression>nextval(&apos;restaurantschema_id_seq&apos;::regclass)</DefaultExpression>
       <TypeId>23</TypeId>
       <SequenceName>restaurantschema_id_seq</SequenceName>
@@ -211,21 +211,42 @@
       <Position>2</Position>
       <DataType>varchar(50)|0</DataType>
       <NotNull>1</NotNull>
-      <StateNumber>556</StateNumber>
+      <StateNumber>567</StateNumber>
       <TypeId>1043</TypeId>
     </column>
-    <index id="38" parent="23" name="restaurantschema_pkey">
-      <ObjectId>16392</ObjectId>
+    <column id="38" parent="23" name="address">
+      <Position>3</Position>
+      <DataType>varchar(50)|0</DataType>
+      <NotNull>1</NotNull>
+      <StateNumber>567</StateNumber>
+      <TypeId>1043</TypeId>
+    </column>
+    <column id="39" parent="23" name="website">
+      <Position>4</Position>
+      <DataType>varchar(50)|0</DataType>
+      <NotNull>1</NotNull>
+      <StateNumber>567</StateNumber>
+      <TypeId>1043</TypeId>
+    </column>
+    <column id="40" parent="23" name="phone">
+      <Position>5</Position>
+      <DataType>varchar(24)|0</DataType>
+      <NotNull>1</NotNull>
+      <StateNumber>567</StateNumber>
+      <TypeId>1043</TypeId>
+    </column>
+    <index id="41" parent="23" name="restaurantschema_pkey">
+      <ObjectId>24584</ObjectId>
       <ColNames>id</ColNames>
       <Unique>1</Unique>
     </index>
-    <key id="39" parent="23" name="restaurantschema_pkey">
-      <ObjectId>16393</ObjectId>
+    <key id="42" parent="23" name="restaurantschema_pkey">
+      <ObjectId>24585</ObjectId>
       <ColNames>id</ColNames>
       <UnderlyingIndexName>restaurantschema_pkey</UnderlyingIndexName>
       <Primary>1</Primary>
     </key>
-    <column id="40" parent="24" name="id">
+    <column id="43" parent="24" name="id">
       <Position>1</Position>
       <DataType>integer|0</DataType>
       <NotNull>1</NotNull>
@@ -234,47 +255,47 @@
       <TypeId>23</TypeId>
       <SequenceName>userschema_id_seq</SequenceName>
     </column>
-    <column id="41" parent="24" name="firstName">
+    <column id="44" parent="24" name="firstName">
       <Position>2</Position>
       <DataType>varchar(20)|0</DataType>
       <NotNull>1</NotNull>
       <StateNumber>556</StateNumber>
       <TypeId>1043</TypeId>
     </column>
-    <column id="42" parent="24" name="lastName">
+    <column id="45" parent="24" name="lastName">
       <Position>3</Position>
       <DataType>varchar(20)|0</DataType>
       <NotNull>1</NotNull>
       <StateNumber>556</StateNumber>
       <TypeId>1043</TypeId>
     </column>
-    <column id="43" parent="24" name="email">
+    <column id="46" parent="24" name="email">
       <Position>4</Position>
       <DataType>varchar(50)|0</DataType>
       <NotNull>1</NotNull>
       <StateNumber>556</StateNumber>
       <TypeId>1043</TypeId>
     </column>
-    <column id="44" parent="24" name="password">
+    <column id="47" parent="24" name="password">
       <Position>5</Position>
       <DataType>varchar(60)|0</DataType>
       <NotNull>1</NotNull>
       <StateNumber>556</StateNumber>
       <TypeId>1043</TypeId>
     </column>
-    <column id="45" parent="24" name="birthday">
+    <column id="48" parent="24" name="birthday">
       <Position>6</Position>
       <DataType>date|0</DataType>
       <NotNull>1</NotNull>
       <StateNumber>556</StateNumber>
       <TypeId>1082</TypeId>
     </column>
-    <index id="46" parent="24" name="userschema_pkey">
+    <index id="49" parent="24" name="userschema_pkey">
       <ObjectId>16408</ObjectId>
       <ColNames>id</ColNames>
       <Unique>1</Unique>
     </index>
-    <key id="47" parent="24" name="userschema_pkey">
+    <key id="50" parent="24" name="userschema_pkey">
       <ObjectId>16409</ObjectId>
       <ColNames>id</ColNames>
       <UnderlyingIndexName>userschema_pkey</UnderlyingIndexName>

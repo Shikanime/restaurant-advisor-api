@@ -2,15 +2,31 @@ package services
 
 import models.Avis
 import models.Restaurant
-import org.jetbrains.exposed.sql.deleteWhere
-import org.jetbrains.exposed.sql.insert
-import org.jetbrains.exposed.sql.select
-import org.jetbrains.exposed.sql.selectAll
+import org.jetbrains.exposed.sql.*
 
 fun findRestaurantById(id: Int): Restaurant {
   return runQuery {
     val foundRestaurants = RestaurantSchema.select {
       RestaurantSchema.id eq id
+    }
+
+    if (foundRestaurants.count() <= 0)
+      throw Exception("Cannot find restaurant")
+
+    val foundRestaurant = foundRestaurants.first()
+
+    return@runQuery Restaurant(
+      foundRestaurant [RestaurantSchema.name],
+      foundRestaurant [RestaurantSchema.address],
+      foundRestaurant [RestaurantSchema.website],
+      foundRestaurant [RestaurantSchema.phone])
+  }
+}
+
+fun findRestaurantByName(name: String): Restaurant {
+  return runQuery {
+    val foundRestaurants = RestaurantSchema.select {
+      RestaurantSchema.name eq name
     }
 
     if (foundRestaurants.count() <= 0)
@@ -43,10 +59,55 @@ fun findAllRestaurant(): Array<Restaurant> {
 
 fun addRestaurant(restaurant: Restaurant): Int {
   return runQuery {
+    when {
+      restaurant.name == null ->
+        throw Exception("Empty name")
+      restaurant.address == null ->
+        throw Exception("Empty address")
+      restaurant.website == null ->
+        throw Exception("Empty website ")
+      restaurant.phone == null ->
+        throw Exception("Empty phone")
+
+      restaurant.name.length > 50 ->
+        throw Exception("Invalid name length, max is 50 characters")
+      restaurant.address.length > 50 ->
+        throw Exception("Invalid address length, max is 20 characters")
+      restaurant.website.length > 50 ->
+        throw Exception("Invalid website length, max is 50 characters")
+      restaurant.phone.length > 24 ->
+        throw Exception("Invalid phone length, max is 24 characters")
+    }
+
     return@runQuery RestaurantSchema.insert {
-      it[name] = restaurant.name
+      it[name] = restaurant.name ?: ""
+      it[address] = restaurant.address ?: ""
+      it[website] = restaurant.website ?: ""
+      it[phone] = restaurant.phone ?: ""
     } get RestaurantSchema.id
       ?: throw Exception("Fail to create new restaurant retry again later")
+  }
+}
+
+fun updateRestaurantById(id: Int, restaurant: Restaurant): Int {
+  return runQuery {
+    val foundRestaurants = RestaurantSchema.select {
+      RestaurantSchema.id.eq(id)
+    }
+
+    if (foundRestaurants.count() <= 0)
+      throw Exception("Cannot find user from email")
+
+    val foundRestaurant= foundRestaurants.first()
+
+    return@runQuery RestaurantSchema.update({
+      RestaurantSchema.id.eq(id)
+    }){
+      it[name] = restaurant.name ?: foundRestaurant[RestaurantSchema.name]
+      it[address] = restaurant.address ?: foundRestaurant[RestaurantSchema.address]
+      it[website] = restaurant.website ?: foundRestaurant[RestaurantSchema.website]
+      it[phone] = restaurant.phone ?: foundRestaurant[RestaurantSchema.phone]
+    }
   }
 }
 

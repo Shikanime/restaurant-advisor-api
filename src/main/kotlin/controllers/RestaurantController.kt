@@ -3,10 +3,8 @@ package controllers
 import models.Avis
 import models.Response
 import models.Restaurant
-import services.addAvisToRestaurant
-import services.addRestaurant
-import services.findAllRestaurant
-import services.findRestaurantById
+import models.User
+import services.*
 import verifyToken
 import javax.ws.rs.*
 import javax.ws.rs.core.MediaType
@@ -29,6 +27,20 @@ class RestaurantController {
     }
   }
 
+  @GET
+  @Path("_name/{name}")
+  @Consumes(APPLICATION_JSON)
+  fun getRestaurantByName(@PathParam("name") name: String): Response {
+    println("[trace] Open get by id restaurant")
+
+    return try {
+      Response(true, findRestaurantByName(name), "")
+    } catch (error: Exception) {
+      println("[error] Fail to get restaurant from $name: $error")
+      Response(false, null, error.message)
+    }
+  }
+
   @POST
   @Consumes(APPLICATION_JSON)
   fun createRestaurant(restaurant: Restaurant): Response {
@@ -38,6 +50,20 @@ class RestaurantController {
       Response(true, addRestaurant(restaurant), "")
     } catch (error: Exception) {
       println("[error] Register restaurant fail: $error")
+      Response(false, null, error.message)
+    }
+  }
+
+  @PUT
+  @Consumes(APPLICATION_JSON)
+  @Path("{id}")
+  fun updateRestaurant(@PathParam("id") id: Int, restaurant: Restaurant): Response {
+    println("[trace] Update user")
+
+    return try {
+      Response(true, updateRestaurantById(id, restaurant), "")
+    } catch (error: Exception) {
+      println("[error] Fail to login: $error")
       Response(false, null, error.message)
     }
   }

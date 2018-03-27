@@ -3,10 +3,7 @@ package services
 import generateToken
 import models.User
 import org.apache.commons.validator.routines.EmailValidator
-import org.jetbrains.exposed.sql.deleteWhere
-import org.jetbrains.exposed.sql.insert
-import org.jetbrains.exposed.sql.select
-import org.jetbrains.exposed.sql.selectAll
+import org.jetbrains.exposed.sql.*
 import org.joda.time.DateTime
 import org.mindrot.jbcrypt.BCrypt
 
@@ -64,11 +61,20 @@ fun userLogin(email: String, password: String): String {
 fun addUser(user: User): Int {
   return runQuery {
     if (UserSchema.select {
-        UserSchema.email.eq(user.email)
+        UserSchema.email.eq(user.email!!)
       }.count() > 0)
       throw Exception("Email already exist")
 
     when {
+      user.firstName == null ->
+        throw Exception("Empty first name")
+      user.lastName == null ->
+        throw Exception("Empty last name")
+      user.email == null ->
+        throw Exception("Empty email")
+      user.password == null ->
+        throw Exception("Empty password")
+
       user.firstName.length > 20 ->
         throw Exception("Invalid first name length, max is 20 characters")
       user.lastName.length > 20 ->
@@ -80,13 +86,42 @@ fun addUser(user: User): Int {
     }
 
     return@runQuery UserSchema.insert {
-      it[lastName] = user.lastName
-      it[firstName] = user.firstName
-      it[email] = user.email
-      it[password] = BCrypt.hashpw(user.password, BCrypt.gensalt(12))
+      it[lastName] = user.lastName ?: ""
+      it[firstName] = user.firstName ?: ""
+      it[email] = user.email ?: ""
+      it[password] = BCrypt.hashpw(user.password, BCrypt.gensalt(12)) ?: ""
       it[birthday] = DateTime.parse(user.birthday)
     } get UserSchema.id
       ?: throw Exception("Fail to insert user")
+  }
+}
+
+fun updateUserById(id: Int, user: User): Int {
+  return runQuery {
+    val findUsers = UserSchema.select {
+      UserSchema.id.eq(id)
+    }
+
+    if (findUsers.count() <= 0)
+      throw Exception("Cannot find user from email")
+
+    val findUser = findUsers.first()
+
+    return@runQuery UserSchema.update({
+      UserSchema.id.eq(id)
+    }){
+      it[lastName] = user.lastName ?: findUser[UserSchema.lastName]
+      it[firstName] = user.firstName ?: findUser[UserSchema.firstName]
+      it[email] = user.email ?: findUser[UserSchema.email]
+      it[password] = if (user.password != null)
+        BCrypt.hashpw(user.password, BCrypt.gensalt(12))
+      else
+        findUser[UserSchema.password]
+      it[birthday] = if (user.birthday != null)
+        DateTime.parse(user.birthday)
+      else
+        findUser[UserSchema.birthday]
+    }
   }
 }
 

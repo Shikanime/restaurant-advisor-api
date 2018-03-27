@@ -36,6 +36,20 @@ class UserController {
     }
   }
 
+  @PUT
+  @Consumes(APPLICATION_JSON)
+  @Path("{id}")
+  fun updateUser(@PathParam("id") id: Int, user: User): Response {
+    println("[trace] Update user")
+
+    return try {
+      Response(true, updateUserById(id, user), "")
+    } catch (error: Exception) {
+      println("[error] Fail to login: $error")
+      Response(false, null, error.message)
+    }
+  }
+
   @DELETE
   @Consumes(APPLICATION_JSON)
   fun deleteUser(@HeaderParam("Authorization") bearer: String): Response {
