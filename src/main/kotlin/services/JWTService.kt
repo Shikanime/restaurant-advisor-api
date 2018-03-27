@@ -19,11 +19,15 @@ fun generateToken(id: String): String {
   return jwsObject.serialize()
 }
 
-fun verifyToken(token: String): Boolean {
+fun verifyToken(token: String): String {
   val jwsObject = JWSObject.parse(token)
 
   val sharedSecret = ByteArray(32)
   val verifier = MACVerifier(sharedSecret)
 
-  return jwsObject.verify(verifier)
+  if (jwsObject.verify(verifier)) {
+    throw Exception("Invalid token")
+  }
+
+  return jwsObject.payload.toString();
 }

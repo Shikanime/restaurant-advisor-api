@@ -2,20 +2,21 @@ package services
 
 import models.Avis
 import models.Restaurant
+import org.jetbrains.exposed.sql.deleteWhere
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.selectAll
 
 fun findRestaurantById(id: Int): Restaurant {
   return runQuery {
-    val findRestaurants = RestaurantSchema.select {
+    val foundRestaurants = RestaurantSchema.select {
       RestaurantSchema.id eq id
     }
 
-    if (findRestaurants.count() <= 0)
+    if (foundRestaurants.count() <= 0)
       throw Exception("Cannot find restaurant")
 
-    return@runQuery Restaurant(findRestaurants.first()[RestaurantSchema.name])
+    return@runQuery Restaurant(foundRestaurants.first()[RestaurantSchema.name])
   }
 }
 
@@ -59,5 +60,45 @@ fun addAvisToRestaurant(currentUserId: Int, currentRestaurantId: Int, avis: Avis
       it[restaurantId] = currentRestaurantId
     } get RestaurantAvisSchema.id
       ?: throw Exception("Restaurant avis creation failed, retry again")
+  }
+}
+
+fun deleteAvisByRestaurantId(currentUserId: Int, currentRestaurantId: Int): Int {
+  return runQuery {
+    val foundRestaurants = RestaurantAvisSchema.select {
+      RestaurantAvisSchema.restaurantId.eq(currentRestaurantId)
+    }
+
+    if (foundRestaurants.count() <= 0)
+      throw Exception("Cannot find restaurant")
+
+    RestaurantAvisSchema.deleteWhere {
+      RestaurantAvisSchema.restaurantId.eq(currentRestaurantId)
+      RestaurantAvisSchema.userId.eq(currentUserId)
+    }
+
+    return@runQuery AvisSchema.deleteWhere {
+      AvisSchema.id.eq(foundRestaurants.first()[RestaurantAvisSchema.avisId])
+    }
+  }
+}
+
+fun deleteAvisByAvisId(currentUserId: Int, currentAvisId: Int): Int {
+  return runQuery {
+    val foundRestaurants = RestaurantAvisSchema.select {
+      RestaurantAvisSchema.avisId.eq(currentAvisId)
+    }
+
+    if (foundRestaurants.count() <= 0)
+      throw Exception("Cannot find restaurant")
+
+    RestaurantAvisSchema.deleteWhere {
+      RestaurantAvisSchema.avisId.eq(currentAvisId)
+      RestaurantAvisSchema.userId.eq(currentUserId)
+    }
+
+    return@runQuery AvisSchema.deleteWhere {
+      AvisSchema.id.eq(foundRestaurants.first()[RestaurantAvisSchema.avisId])
+    }
   }
 }

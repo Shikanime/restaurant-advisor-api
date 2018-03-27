@@ -1,6 +1,7 @@
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.module.kotlin.KotlinModule
+import controllers.AvisController
 import controllers.RestaurantController
 import controllers.UserController
 import org.eclipse.jetty.server.Server
@@ -21,6 +22,7 @@ fun main(args: Array<String>) {
     .register(ObjectMapperProvider::class.java) // use our ObjectMapper rather than the default
     .register(RestaurantController())
     .register(UserController())
+    .register(AvisController())
 
   JettyHttpContainerFactory.createServer(baseUri, config).use { server ->
     server.join()

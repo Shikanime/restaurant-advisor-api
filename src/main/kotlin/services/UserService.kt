@@ -3,6 +3,7 @@ package services
 import generateToken
 import models.User
 import org.apache.commons.validator.routines.EmailValidator
+import org.jetbrains.exposed.sql.deleteWhere
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.selectAll
@@ -67,17 +68,16 @@ fun addUser(user: User): Int {
       }.count() > 0)
       throw Exception("Email already exist")
 
-    if (user.firstName.length > 20)
-      throw Exception("Invalid first name length, max is 20 characters")
-
-    if (user.lastName.length > 20)
-      throw Exception("Invalid last name length, max is 20 characters")
-
-    if (!EmailValidator.getInstance().isValid(user.email))
-      throw Exception("Email is not valid")
-
-    if (user.password.length > 20 || user.password.length < 5)
-      throw Exception("Invalid password length, max is 60 characters and minimum is about 6 characters")
+    when {
+      user.firstName.length > 20 ->
+        throw Exception("Invalid first name length, max is 20 characters")
+      user.lastName.length > 20 ->
+        throw Exception("Invalid last name length, max is 20 characters")
+      !EmailValidator.getInstance().isValid(user.email) ->
+        throw Exception("Email is not valid")
+      user.password.length > 60 || user.password.length < 5 ->
+        throw Exception("Invalid password length, max is 60 characters and minimum is about 6 characters")
+    }
 
     return@runQuery UserSchema.insert {
       it[lastName] = user.lastName
@@ -87,5 +87,13 @@ fun addUser(user: User): Int {
       it[birthday] = DateTime.parse(user.birthday)
     } get UserSchema.id
       ?: throw Exception("Fail to insert user")
+  }
+}
+
+fun deleteUserById(id: Int): Int {
+  return runQuery {
+    return@runQuery UserSchema.deleteWhere {
+      UserSchema.id.eq(id)
+    }
   }
 }
