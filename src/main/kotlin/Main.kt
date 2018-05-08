@@ -1,9 +1,9 @@
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.module.kotlin.KotlinModule
-import controllers.AvisController
-import controllers.RestaurantController
-import controllers.UserController
+import controllers.Avis
+import controllers.Restaurant
+import controllers.User
 import org.eclipse.jetty.server.Server
 import org.glassfish.jersey.jackson.JacksonFeature
 import org.glassfish.jersey.jetty.JettyHttpContainerFactory
@@ -20,9 +20,9 @@ fun main(args: Array<String>) {
   val config = ResourceConfig()
     .register(JacksonFeature::class.java) // enable Jackson JSON provider
     .register(ObjectMapperProvider::class.java) // use our ObjectMapper rather than the default
-    .register(RestaurantController())
-    .register(UserController())
-    .register(AvisController())
+    .register(Restaurant())
+    .register(User())
+    .register(Avis())
 
   JettyHttpContainerFactory.createServer(baseUri, config).use { server ->
     server.join()
@@ -43,7 +43,6 @@ class ObjectMapperProvider : ContextResolver<ObjectMapper> {
 
   override fun getContext(type: Class<*>?): ObjectMapper? = objectMapper
 }
-
 
 /**
  * Executes the given [block] function on this Server and then destroys it.

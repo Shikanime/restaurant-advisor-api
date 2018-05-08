@@ -1,12 +1,21 @@
 version: '3'
 
 services:
+  server:
+    container_name: resto_server
+    build: .
+    environment:
+      - DATABASE_URI=jdbc:postgresql://database:5432/resto
+      - DATABASE_USER=resto
+      - DATABASE_PASSWORD=evolution
+    ports:
+      - 8080:8080
+    restart: always
+
   database:
-    container_name: resto
+    container_name: resto_database
     image: postgres:alpine
     environment:
       - POSTGRES_USER=resto
       - POSTGRES_PASSWORD=evolution
-    ports:
-      - 5432:5432
     restart: always
